@@ -14,7 +14,11 @@ def to_time(seconds):
     seconds %= 60
     hours = minutes // 60
     minutes %= 60
+    days = hours // 24
+    hours %= 24
 
+    if days != 0:
+        out += str(days) + 'd '
     if hours != 0:
         out += str(hours) + 'h '
     if minutes != 0:
@@ -223,6 +227,7 @@ class Scraper:
         try:
             html = r.get(url, timeout=self.timeout)
         except r.exceptions.ReadTimeout:
+            print('Timeout at ' + url)
             return
 
         if html.status_code != 200:
@@ -230,7 +235,16 @@ class Scraper:
         html = html.text
 
         # Get title
-        title = re.search(r'(?<=mw-first-heading">)[^<]+', html).group()
+        try:
+            title = re.search(r'(?<=mw-first-heading">)[^<]+', html).group()
+        except AttributeError:
+            try:
+                title = url.split('/')[-1]
+            except AttributeError:
+                i = 0
+                while os.path.exists(self.folder + '/articles/MISSINGTITLE_' + str(i) + '.txt'):
+                    i += 1
+                title = 'MISSINGTITLE_' + str(i)
         self.article.configure(text=title)
         self.root.update()
 
@@ -266,7 +280,7 @@ class Scraper:
             links = re.findall(r'(?<=href="/wiki/)[^"]*', html)
             links.sort()
             links = list(dict.fromkeys(links))
-            self.num_left += len(links)
+            self.num_left += len(links) ** (int(self.depth) - depth)
             for link in links:
                 with open(self.folder + '/index.txt', 'r') as file:
                     if re.search(link, file.read()):

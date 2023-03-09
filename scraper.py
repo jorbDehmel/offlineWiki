@@ -5,6 +5,7 @@ import regex as re
 import os
 import time
 
+
 def to_time(seconds):
     out = ''
 
@@ -29,8 +30,9 @@ def to_time(seconds):
     buffer = ' ' * 30
     return buffer + out + buffer
 
+
 class Scraper:
-    def __init__(self, root=None, folder = ''):
+    def __init__(self, root=None, folder=''):
         # Needed variables
         self.folder = folder
         self.starting_link = ''
@@ -88,7 +90,8 @@ class Scraper:
 
         if self.folder == '':
             # Get location button
-            tk.Button(self.root, text='Select folder', command=self._get_dir).pack()
+            tk.Button(self.root, text='Select folder',
+                      command=self._get_dir).pack()
 
         # Go button
         tk.Button(self.root, text='Begin', command=self._page2).pack()
@@ -152,7 +155,8 @@ class Scraper:
         self.article.pack()
 
         # Emergency kill button
-        tk.Button(self.root, text='Cancel (saves data)', command=self.root.destroy).pack()
+        tk.Button(self.root, text='Cancel (saves data)',
+                  command=self.root.destroy).pack()
 
         self.root.update()
 
@@ -182,6 +186,7 @@ class Scraper:
         # Open root page
         self.num_left = 1
         self._scrape_to_file(self.starting_link, depth=0)
+        # self._better_scrape_to_file(self.starting_link, depth=0)
 
         # Go to end screen
         self._page3()
@@ -200,7 +205,8 @@ class Scraper:
 
         # Finishing label
         end_time = time.time()
-        tk.Label(self.root, text='Successfully finished in\n' + to_time(end_time - self.start_time)).pack()
+        tk.Label(self.root, text='Successfully finished in\n' +
+                 to_time(end_time - self.start_time)).pack()
 
         # Kill button
         tk.Button(self.root, text='Close', command=self.root.destroy).pack()
@@ -253,7 +259,8 @@ class Scraper:
                 if re.search(title, file.read()):
                     return
 
-        text = ''.join(re.findall(r'(?<=<p>).+?(?=</p>)', html, flags=re.DOTALL))
+        text = ''.join(re.findall(
+            r'(?<=<p>).+?(?=</p>)', html, flags=re.DOTALL))
         text = '\t' + text
         text = re.sub(r'<.*?>', r'', text, flags=re.DOTALL)
         text = re.sub(r'&[^ ]+', r'', text)
@@ -287,19 +294,14 @@ class Scraper:
                         continue
                 try:
                     link = re.sub(r'\*', r'\*', link)
-                    self._scrape_to_file('https://en.wikipedia.org/wiki/' + link, depth + 1)
-                #except AttributeError:
-                    #print('HTML parsing failed')
-                #except UnicodeEncodeError:
-                    #print('Non-unicode title')
+                    self._scrape_to_file(
+                        'https://en.wikipedia.org/wiki/' + link, depth + 1)
                 except:
                     pass
-                    #print('Unknown error thrown')
 
             # Update
             print(title, 'finished.')
         return
-        #https://en.wikipedia.org/wiki/Artificial_intelligence
 
 
 if __name__ == '__main__':

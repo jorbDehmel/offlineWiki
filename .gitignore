@@ -1,0 +1,6 @@
+*.exe
+*.out
+articles/
+__pycache__
+offlineWiki/
+*.txt
